@@ -445,26 +445,6 @@
       <button class="popup-action-btn" id="profileActionBtn">🎯 View Special Offer</button>
     </div>
   </div>
-  <div class="popup-overlay profile-popup" id="buttonPopup">
-    <div class="popup">
-      <div class="close-icon" id="closeButtonIcon">×</div>
-      <div class="popup-header" id="buttonPopupHeader">Button Title</div>
-      <div class="popup-title" id="buttonPopupTitle">Button Subtitle</div>
-      <ul class="bullet-points" id="buttonBulletPoints">
-        <li>Sample bullet point 1</li>
-        <li>Sample bullet point 2</li>
-        <li>Sample bullet point 3</li>
-      </ul>
-      <div class="popup-banner-ad" id="buttonPopupBanner">
-        <a href="https://t.mbslr2.com/371938/8780/0?aff_sub=jon&bo=2779,2778,2777,2776,2775&source=fb&po=6533&aff_sub5=SF_006OG000004lmDN"
-           target="_blank">
-          <img id="rotatingBannerButton" src="https://www.imglnkx.com/8780/PMKT-1157_DESIGN-16618_BannersWebinar_AmyPose_300100.gif"
-               width="300" height="100" border="0" />
-        </a>
-      </div>
-      <button class="popup-action-btn" id="buttonActionBtn">🎯 Action Button</button>
-    </div>
-  </div>
   <script>
     const profileData = {
       name: "CS models",
@@ -518,13 +498,6 @@
       document.getElementById("rotatingBannerPopup").src = banners[currentBannerPopup];
     }, 3000);
 
-    // Banner rotator for button popup
-    let currentBannerButton = 0;
-    setInterval(() => {
-      currentBannerButton = (currentBannerButton + 1) % banners.length;
-      document.getElementById("rotatingBannerButton").src = banners[currentBannerButton];
-    }, 3000);
-
     function renderProfile() {
       document.getElementById("profilePicture").src = profileData.avatar;
       document.getElementById("profilePicture").alt = profileData.name + " Avatar";
@@ -559,45 +532,6 @@
         a.appendChild(img);
         mainGrid.appendChild(a);
       });
-    }
-
-    function showButtonPopup(type) {
-      const buttonData = {
-        explicit: {
-          name: "🔞 Explicit Content",
-          title: "Premium Adult Content",
-          bulletPoints: [
-            "Exclusive content for adults only",
-            "Limited and personalized material",
-            "Full access to the premium collection"
-          ],
-          actionText: "🔓 View Content"
-        },
-        livestream: {
-          name: "👁️ +18 Livestream",
-          title: "Live Interactive Sessions",
-          bulletPoints: [
-            "Real-time livestream 24/7",
-            "Direct and private interaction",
-            "Exclusive and personalized sessions"
-          ],
-          actionText: "🎥 Join Now"
-        }
-      };
-      const data = buttonData[type];
-      document.getElementById("buttonPopupHeader").textContent = data.name;
-      document.getElementById("buttonPopupTitle").textContent = data.title;
-      const bulletList = document.getElementById("buttonBulletPoints");
-      bulletList.innerHTML = "";
-      data.bulletPoints.forEach(point => {
-        const li = document.createElement("li");
-        li.textContent = point;
-        bulletList.appendChild(li);
-      });
-      document.getElementById("buttonActionBtn").textContent = data.actionText;
-      document.getElementById("buttonActionBtn").setAttribute("data-url", mainLink);
-      document.getElementById("buttonPopupBanner").setAttribute("data-url", mainLink);
-      document.getElementById("buttonPopup").style.display = "flex";
     }
 
     function showProfilePopup() {
@@ -643,24 +577,21 @@
 
     document.addEventListener('DOMContentLoaded', function() {
       renderProfile();
+      
+      // Profile picture and banner click handlers
       document.getElementById("profilePicture").onclick = showProfilePopup;
       document.getElementById("bannerArea").onclick = showProfilePopup;
+      
+      // Button click handlers - now show the same popup as profile picture
+      document.getElementById("explicitBtn").onclick = showProfilePopup;
+      document.getElementById("livestreamBtn").onclick = showProfilePopup;
+      
+      // Close popup handlers
       document.getElementById("closeProfileIcon").onclick = () => {
         document.getElementById("profilePopup").style.display = "none";
       };
-      document.getElementById("closeButtonIcon").onclick = () => {
-        document.getElementById("buttonPopup").style.display = "none";
-      };
-      document.getElementById("buttonPopupBanner").onclick = () => {
-        const url = document.getElementById("buttonPopupBanner").getAttribute("data-url");
-        window.open(url, '_blank');
-        document.getElementById("buttonPopup").style.display = "none";
-      };
-      document.getElementById("buttonActionBtn").onclick = () => {
-        const url = document.getElementById("buttonActionBtn").getAttribute("data-url");
-        window.open(url, '_blank');
-        document.getElementById("buttonPopup").style.display = "none";
-      };
+      
+      // Banner and action button click handlers
       document.getElementById("profilePopupBanner").onclick = () => {
         window.open(mainLink, '_blank');
         document.getElementById("profilePopup").style.display = "none";
@@ -669,9 +600,20 @@
         window.open(mainLink, '_blank');
         document.getElementById("profilePopup").style.display = "none";
       };
+      
+      // Stats popup handlers
       document.getElementById("closeStatsIcon").onclick = () => {
         document.getElementById("statsPopup").style.display = "none";
       };
+      document.getElementById("photoStats").onclick = () => { showStatsPopup("photos"); };
+      document.getElementById("videoStats").onclick = () => { showStatsPopup("videos"); };
+      
+      // Unlock button handler
+      document.getElementById("unlockBtn").onclick = () => {
+        window.open(mainLink, '_blank');
+      };
+      
+      // Close popups when clicking outside
       document.getElementById("statsPopup").onclick = (e) => {
         if (e.target.id === "statsPopup") {
           document.getElementById("statsPopup").style.display = "none";
@@ -682,22 +624,6 @@
           document.getElementById("profilePopup").style.display = "none";
         }
       };
-      document.getElementById("buttonPopup").onclick = (e) => {
-        if (e.target.id === "buttonPopup") {
-          document.getElementById("buttonPopup").style.display = "none";
-        }
-      };
-      document.getElementById("explicitBtn").onclick = () => {
-        showButtonPopup("explicit");
-      };
-      document.getElementById("livestreamBtn").onclick = () => {
-        showButtonPopup("livestream");
-      };
-      document.getElementById("unlockBtn").onclick = () => {
-        window.open(mainLink, '_blank');
-      };
-      document.getElementById("photoStats").onclick = () => { showStatsPopup("photos"); };
-      document.getElementById("videoStats").onclick = () => { showStatsPopup("videos"); };
     });
   </script>
 </body>
