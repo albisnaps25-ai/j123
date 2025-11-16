@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile Landing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
+    <style>
+        .profile-container {
+            /* White background */
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            /* Centered properly */
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border-radius: 16px;
+        }
+        
+        .star-rating {
+            color: #fbbf24;
+        }
+        
+        .verified-badge {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        /* Dynamic sizing based on username length */
+        .username-text {
+            font-size: 3rem;
+            white-space: nowrap;
+        }
+        
+        .badge-svg {
+            width: 32px;
+            height: 32px;
+        }
+        
+        .flag-icon {
+            width: 60px;
+            height: 39px;
+        }
+        
+        .action-button {
+            transition: all 0.3s ease;
+            border-radius: 25px;
+            font-weight: 600;
+            padding: 12px 24px;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .explicit-button {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+        
+        .explicit-button:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+        
+        .livestream-button {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+        
+        .livestream-button:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+        
+        .slider-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            /* Made slider bigger */
+            height: 500px;
+        }
+        
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        
+        .slide.active {
+            opacity: 1;
+        }
+        
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .media-stats {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+        
+        .media-stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .media-stat-item i {
+            font-size: 18px;
+        }
+        
+        .age-badge {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-left: 4px;
+        }
+        
+        /* Popup styles */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .popup-content {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            width: 400px;
+            height: 550px;
+            text-align: center;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            font-family: 'Times New Roman', Times, serif;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+        
+        .popup-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Loading animation */
+        .loading-spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .popup-content-inner {
+            display: none;
+        }
+        
+        .popup-content-inner.show {
+            display: block;
+        }
+        
+        /* Action buttons vertical layout */
+        .action-buttons-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 32px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .action-buttons-vertical .action-button {
+            flex: none;
+        }
+        
+        /* Mobile Responsive Styles */
+        @media (max-width: 640px) {
+            .action-buttons-vertical {
+                max-width: 100%;
+                padding: 0 16px;
+            }
+            
+            .slider-container {
+                height: 400px;
+            }
+            
+            .profile-container {
+                padding: 16px !important;
+            }
+            
+            /* Make profile photo smaller on mobile */
+            .profile-header img {
+                width: 80px !important;
+                height: 80px !important;
+            }
+            
+            .profile-header .relative.flex-shrink-0 {
+                margin-left: -10px !important;
+            }
+            
+            /* Adjust profile info spacing */
+            .profile-info {
+                margin-left: 16px !important;
+            }
+            
+            /* Mobile adjustments for dynamic name sizing */
+            .username-text {
+                font-size: 1.5rem !important;
+            }
+            
+            .badge-svg {
+                width: 20px !important;
+                height: 20px !important;
+            }
+            
+            .flag-icon {
+                width: 36px !important;
+                height: 24px !important;
+            }
+            
+            /* Make stars smaller */
+            .star-rating i {
+                font-size: 1.25rem !important;
+            }
+            
+            /* Make media stats smaller */
+            .profile-header .flex.items-center.gap-4 i {
+                font-size: 1.25rem !important;
+            }
+            
+            .profile-header .flex.items-center.gap-4 span {
+                font-size: 0.875rem !important;
+            }
+            
+            .action-button {
+                padding: 16px 24px;
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 8px !important;
+                padding-right: 8px !important;
+            }
+            
+            .profile-container {
+                padding: 20px !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- User Profile Section -->
+        <div class="profile-container p-8 mb-8" id="profileContainer">
+            <!-- Profile Header -->
+            <div class="profile-header flex items-start mb-6">
+                <div class="relative flex-shrink-0" style="margin-left: -20px;">
+                    <img src="images/profile.png" alt="Profile Photo" 
+                         class="w-52 h-52 rounded-full object-cover shadow-lg">
+                </div>
+                <div class="profile-info ml-6 flex-1 min-w-0">
+                    <div class="flex items-center mb-2" id="nameContainer">
+                        <h1 class="mr-3 uppercase tracking-wide username-text" style="font-family: 'Montserrat', sans-serif; font-weight: 800; color: #1A197C;"> Ava louise </h1>
+                        <div class="verified-badge mr-2 badge-icon">
+                            <svg class="badge-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="12" fill="#1DA1F2"/>
+                                <path d="M17.2727 8.40909L10.2879 15.3939L7.04545 12.1515" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <!-- Star Rating -->
+                    <div class="flex items-center mb-3 gap-3">
+                        <div class="star-rating flex">
+                            <i class="fas fa-star text-3xl"></i>
+                            <i class="fas fa-star text-3xl"></i>
+                            <i class="fas fa-star text-3xl"></i>
+                            <i class="fas fa-star text-3xl"></i>
+                            <i class="fas fa-star text-3xl"></i>
+                        </div>
+                        <!-- USA flag icon -->
+                        <svg class="flag-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#FFF" viewBox="0 0 1235 650">
+                            <path d="M0 0h1235v650H0"/>
+                            <path stroke="#b22234" stroke-dasharray="50" stroke-width="2470" d="M0 0v651"/>
+                            <path fill="#3c3b6e" d="M0 0h494v350H0"/>
+                            <g id="e">
+                                <g id="d">
+                                    <g id="f">
+                                        <g id="c">
+                                            <g id="b">
+                                                <path id="a" d="m30 50.6 12-36 12 36-30.8-22H61"/>
+                                                <use xlink:href="#a" x="82"/>
+                                            </g>
+                                            <use xlink:href="#b" x="164"/>
+                                            <use xlink:href="#a" x="328"/>
+                                        </g>
+                                        <use xlink:href="#a" x="410"/>
+                                    </g>
+                                    <use xlink:href="#c" x="41" y="35"/>
+                                </g>
+                                <use xlink:href="#d" y="70"/>
+                            </g>
+                            <use xlink:href="#e" y="140"/>
+                            <use xlink:href="#f" y="280"/>
+                        </svg>
+                    </div>
+                    
+                    <!-- Media Stats (Photos and Videos) - Made text bigger -->
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-images" style="color: #1A197C; font-size: clamp(1.5rem, 4vw, 2.5rem);"></i>
+                            <span class="font-medium" style="color: #FF4FA3; font-size: clamp(1rem, 3vw, 1.875rem); white-space: nowrap;">425 photos</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-film" style="color: #1A197C; font-size: clamp(1.5rem, 4vw, 2.5rem);"></i>
+                            <span class="font-medium" style="color: #FF4FA3; font-size: clamp(1rem, 3vw, 1.875rem); white-space: nowrap;">537 videos</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Banner Ad -->
+        <div class="flex justify-center mb-8">
+            <a href="https://t.mbslr2.com/345557/8780/0?aff_sub3=TC_MD11LP3F&aff_sub5=SF_006OG00000DS1Hp&aff_sub=iksy" target="_blank">
+                <img src="https://www.imglnkx.com/8780/DESIGN-19806_Neon_300100_6.gif" width="300" height="100" border="0" />
+            </a>
+        </div>
+        
+        <!-- Action Buttons Vertical Layout -->
+        <div class="action-buttons-vertical">
+            <button class="action-button explicit-button" id="explicitBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff" style="margin-right: 8px;"><path d="M240-160h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM240-160v-400 400Zm0 80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h280v-80q0-83 58.5-141.5T720-920q83 0 141.5 58.5T920-720h-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80h120q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Z"/></svg>
+                Explicit Content
+            </button>
+            <button class="action-button livestream-button" id="livestreamBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff" style="margin-right: 8px;"><path d="M480-392q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q141 0 257.5 76T912-520h-91q-52-93-143-146.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280q20 0 40-2t40-6v81q-20 3-40 5t-40 2Zm0-120q22 0 42.5-5t38.5-14q5-50 31.5-90t67.5-64v-7q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm-5-180Zm205 380q-17 0-28.5-11.5T640-160v-120q0-17 11.5-28.5T680-320v-40q0-33 23.5-56.5T760-440q33 0 56.5 23.5T840-360v40q17 0 28.5 11.5T880-280v120q0 17-11.5 28.5T840-120H680Zm40-200h80v-40q0-17-11.5-28.5T760-400q-17 0-28.5 11.5T720-360v40Z"/></svg>
+                +18 Livestream
+            </button>
+        </div>
+        
+        <!-- Image Slider -->
+        <div class="slider-container mb-8">
+            <div class="slide active">
+                <img src="images/slide1.jpg" alt="Slide 1">
+            </div>
+            <div class="slide">
+                <img src="images/slide2.jpg" alt="Slide 2">
+            </div>
+            <div class="slide">
+                <img src="images/slide3.jpg" alt="Slide 3">
+            </div>
+            <div class="slide">
+                <img src="images/slide4.jpg" alt="Slide 4">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Popup Overlay -->
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-content" style="position: relative;">
+            <button class="popup-close" id="popupClose">&times;</button>
+            <h2 class="text-2xl text-gray-800 mb-4" style="font-weight: 700; margin-top: 0; color: #1A2A7A; text-transform: uppercase;"> Ava louise </h2>
+            <div class="loading-spinner" id="loadingSpinner"></div>
+            <div class="popup-content-inner" id="popupContentInner">
+                <h3 class="text-xl text-gray-700 mb-4">Watch my content for Free in 'Jerkmate'</h3>
+                <div class="text-left mb-4 px-4">
+                    <p class="text-gray-700 mb-1.5 text-base">1- Create a free Jerkmate account</p>
+                    <p class="text-gray-700 mb-1.5 text-base">2- Get the free Lifetime Membership</p>
+                    <p class="text-gray-700 mb-1.5 text-base">3- Enjoy me and thousands of more models"</p>
+                </div>
+                <div class="flex justify-center mb-4">
+                    <a href="https://t.mbslr2.com/345557/8780/0?aff_sub3=TC_MD11LP3F&aff_sub5=SF_006OG00000DS1Hp&aff_sub=iksy" target="_blank"><img src="https://www.imglnkx.com/8780/HawkTuah_Banners_GinaValentina_v1_300100.gif" width="300" height="100" border="0" /></a>
+                </div>
+                <a href="https://t.mbslr2.com/345557/8780/0?aff_sub3=TC_MD11LP3F&aff_sub5=SF_006OG00000DS1Hp&aff_sub=iksy" target="_blank" class="action-button explicit-button" style="max-width: 300px; margin: 0 auto;">
+                    <i class="fas fa-arrow-right mr-2"></i>
+                    Join for Free
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Image Slider Functionality
+        class ImageSlider {
+            constructor() {
+                this.currentSlide = 0;
+                this.slides = document.querySelectorAll('.slide');
+                this.totalSlides = this.slides.length;
+                this.interval = null;
+                
+                this.init();
+            }
+            
+            init() {
+                // Start the automatic slider
+                this.startSlider();
+                
+                // Add click handlers for action buttons
+                this.addButtonHandlers();
+                
+                // Add popup handlers
+                this.addPopupHandlers();
+            }
+            
+            startSlider() {
+                this.interval = setInterval(() => {
+                    this.nextSlide();
+                }, 4000); // Change slide every 4 seconds
+            }
+            
+            nextSlide() {
+                // Hide current slide
+                this.slides[this.currentSlide].classList.remove('active');
+                
+                // Move to next slide
+                this.currentSlide = (this.currentSlide + 1) % this.totalSlides;
+                
+                // Show new slide
+                this.slides[this.currentSlide].classList.add('active');
+            }
+            
+            addButtonHandlers() {
+                // Explicit Content Button
+                const explicitBtn = document.getElementById('explicitBtn');
+                explicitBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.showPopup();
+                });
+                
+                // Livestream Button
+                const livestreamBtn = document.getElementById('livestreamBtn');
+                livestreamBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.showPopup();
+                });
+            }
+            
+            addPopupHandlers() {
+                // Profile container click
+                const profileContainer = document.getElementById('profileContainer');
+                profileContainer.addEventListener('click', () => {
+                    this.showPopup();
+                });
+                
+                // Slider container click
+                const sliderContainer = document.querySelector('.slider-container');
+                sliderContainer.addEventListener('click', () => {
+                    this.showPopup();
+                });
+                
+                // Popup close button
+                const popupClose = document.getElementById('popupClose');
+                popupClose.addEventListener('click', () => {
+                    this.hidePopup();
+                });
+                
+                // Close popup when clicking overlay
+                const popupOverlay = document.getElementById('popupOverlay');
+                popupOverlay.addEventListener('click', (e) => {
+                    if (e.target === popupOverlay) {
+                        this.hidePopup();
+                    }
+                });
+            }
+            
+            showPopup() {
+                const popupOverlay = document.getElementById('popupOverlay');
+                const loadingSpinner = document.getElementById('loadingSpinner');
+                const popupContentInner = document.getElementById('popupContentInner');
+                
+                // Show overlay
+                popupOverlay.style.display = 'flex';
+                
+                // Show loading, hide content
+                loadingSpinner.style.display = 'block';
+                popupContentInner.classList.remove('show');
+                
+                // Add animation
+                setTimeout(() => {
+                    popupOverlay.style.opacity = '1';
+                }, 10);
+                
+                // After 0.8 seconds, hide loading and show content
+                setTimeout(() => {
+                    loadingSpinner.style.display = 'none';
+                    popupContentInner.classList.add('show');
+                }, 800);
+            }
+            
+            hidePopup() {
+                const popupOverlay = document.getElementById('popupOverlay');
+                popupOverlay.style.opacity = '0';
+                
+                setTimeout(() => {
+                    popupOverlay.style.display = 'none';
+                }, 300);
+            }
+            
+            showNotification(message, type) {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+                    type === 'warning' ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'
+                }`;
+                notification.textContent = message;
+                
+                // Add to page
+                document.body.appendChild(notification);
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new ImageSlider();
+            
+            // Add some interactive enhancements
+            addInteractiveEnhancements();
+            
+            // Adjust name and badge sizes based on username length
+            adjustNameSize();
+        });
+
+        function adjustNameSize() {
+            const nameContainer = document.getElementById('nameContainer');
+            const usernameText = nameContainer.querySelector('.username-text');
+            const badgeSvg = nameContainer.querySelector('.badge-svg');
+            const flagIcon = nameContainer.querySelector('.flag-icon');
+            
+            const username = usernameText.textContent.trim();
+            const nameLength = username.length;
+            
+            // Calculate size based on name length
+            // Short names (1-5 chars): larger
+            // Medium names (6-10 chars): medium
+            // Long names (11+ chars): smaller
+            
+            let fontSize, badgeSize, flagWidth, flagHeight;
+            
+            if (nameLength <= 5) {
+                // Short name - make everything bigger
+                fontSize = '3rem';
+                badgeSize = '32px';
+                flagWidth = '60px';
+                flagHeight = '39px';
+            } else if (nameLength <= 10) {
+                // Medium name - medium size
+                fontSize = '2.25rem';
+                badgeSize = '26px';
+                flagWidth = '50px';
+                flagHeight = '32px';
+            } else if (nameLength <= 15) {
+                // Long name - smaller
+                fontSize = '1.75rem';
+                badgeSize = '22px';
+                flagWidth = '42px';
+                flagHeight = '27px';
+            } else {
+                // Very long name - very small
+                fontSize = '1.25rem';
+                badgeSize = '18px';
+                flagWidth = '36px';
+                flagHeight = '23px';
+            }
+            
+            // Apply sizes
+            usernameText.style.fontSize = fontSize;
+            badgeSvg.style.width = badgeSize;
+            badgeSvg.style.height = badgeSize;
+            flagIcon.style.width = flagWidth;
+            flagIcon.style.height = flagHeight;
+        }
+
+        function addInteractiveEnhancements() {
+            // Add hover effects to media stats
+            const mediaStatItems = document.querySelectorAll('.media-stat-item');
+            mediaStatItems.forEach(item => {
+                item.addEventListener('mouseenter', () => {
+                    item.style.transform = 'translateY(-2px)';
+                    item.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.1)';
+                    item.style.transition = 'all 0.3s ease';
+                });
+                
+                item.addEventListener('mouseleave', () => {
+                    item.style.transform = 'translateY(0)';
+                    item.style.boxShadow = 'none';
+                });
+            });
+        }
+    </script>
+</body>
+</html>
